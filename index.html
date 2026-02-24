@@ -1,0 +1,677 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Poke Survivor — Pokemon x Vampire Survivors</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@200;300;400;500;600;700&family=JetBrains+Mono:wght@300;400&family=Noto+Sans+KR:wght@200;300;400;500;600;700&display=swap');
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #08080d;
+    --surface: #111118;
+    --border: #1a1a25;
+    --text: #c8c8d0;
+    --text-dim: #666680;
+    --accent: #f43f5e;
+    --accent2: #667eea;
+    --accent3: #f093fb;
+    --gold: #fbbf24;
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Noto Sans KR', 'Inter', sans-serif;
+    line-height: 1.8;
+    overflow-x: hidden;
+  }
+
+  canvas#stars {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .content {
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ===== Hero ===== */
+  .hero {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 2rem;
+  }
+
+  .hero-badge {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.75rem;
+    letter-spacing: 0.3em;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 1.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.3s;
+  }
+
+  .hero-title {
+    font-size: clamp(2.5rem, 8vw, 5rem);
+    font-weight: 700;
+    letter-spacing: -0.02em;
+    background: linear-gradient(135deg, var(--gold) 0%, #fff 50%, var(--gold) 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin-bottom: 0.5rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.5s;
+  }
+
+  .hero-sub {
+    font-size: clamp(1rem, 3vw, 1.3rem);
+    font-weight: 300;
+    color: var(--text-dim);
+    margin-bottom: 3rem;
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.7s;
+  }
+
+  .hero-meta {
+    display: flex;
+    gap: 2rem;
+    flex-wrap: wrap;
+    justify-content: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    opacity: 0;
+    animation: fadeUp 1s ease forwards 0.9s;
+  }
+
+  .hero-meta span {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .hero-meta .dot {
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--gold);
+  }
+
+  /* ===== Sections ===== */
+  section {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 4rem 1.5rem;
+  }
+
+  .section-wide {
+    max-width: 1000px;
+  }
+
+  .section-label {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.7rem;
+    letter-spacing: 0.3em;
+    text-transform: uppercase;
+    color: var(--accent2);
+    margin-bottom: 1rem;
+  }
+
+  h2 {
+    font-size: clamp(1.5rem, 4vw, 2.2rem);
+    font-weight: 600;
+    color: #e8e8f0;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+
+  p {
+    margin-bottom: 1.2rem;
+    font-weight: 300;
+    font-size: 0.95rem;
+  }
+
+  .highlight {
+    color: var(--accent3);
+    font-weight: 400;
+  }
+
+  .accent-text {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .gold-text {
+    color: var(--gold);
+    font-weight: 500;
+  }
+
+  /* ===== Divider ===== */
+  .divider {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+  }
+
+  .divider-line {
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border), transparent);
+  }
+
+  /* ===== Image ===== */
+  .img-card {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    margin: 2rem 0;
+    background: var(--surface);
+  }
+
+  .img-card img {
+    width: 100%;
+    display: block;
+  }
+
+  .img-caption {
+    padding: 0.8rem 1rem;
+    font-size: 0.75rem;
+    color: var(--text-dim);
+    font-family: 'JetBrains Mono', monospace;
+    letter-spacing: 0.05em;
+  }
+
+  .img-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+    margin: 2rem 0;
+  }
+
+  .img-grid .img-card {
+    margin: 0;
+  }
+
+  @media (max-width: 600px) {
+    .img-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ===== Quote ===== */
+  .quote-block {
+    border-left: 2px solid var(--gold);
+    padding: 1.5rem 2rem;
+    margin: 2.5rem 0;
+    background: rgba(251, 191, 36, 0.03);
+    border-radius: 0 8px 8px 0;
+  }
+
+  .quote-block p {
+    font-size: 1.05rem;
+    font-weight: 400;
+    color: #d0d0e0;
+    margin-bottom: 0;
+    font-style: italic;
+  }
+
+  .quote-block .quote-src {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    font-style: normal;
+    margin-top: 0.8rem;
+  }
+
+  /* ===== Tech Stack ===== */
+  .tech-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 0.8rem;
+    margin: 1.5rem 0;
+  }
+
+  .tech-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 0.8rem 1rem;
+    font-size: 0.8rem;
+    text-align: center;
+    transition: border-color 0.3s;
+  }
+
+  .tech-item:hover {
+    border-color: var(--accent2);
+  }
+
+  .tech-item .tech-name {
+    color: #e0e0f0;
+    font-weight: 500;
+    margin-bottom: 0.2rem;
+  }
+
+  .tech-item .tech-role {
+    color: var(--text-dim);
+    font-size: 0.7rem;
+  }
+
+  /* ===== Pipeline (Timeline) ===== */
+  .pipeline {
+    display: flex;
+    flex-direction: column;
+    gap: 0;
+    margin: 2rem 0;
+  }
+
+  .pipeline-step {
+    display: flex;
+    gap: 1.2rem;
+    align-items: flex-start;
+  }
+
+  .pipeline-line {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    flex-shrink: 0;
+  }
+
+  .pipeline-dot {
+    width: 10px; height: 10px;
+    border-radius: 50%;
+    background: var(--accent2);
+    flex-shrink: 0;
+    margin-top: 0.4rem;
+  }
+
+  .pipeline-dot.gold { background: var(--gold); }
+  .pipeline-dot.pink { background: var(--accent); }
+
+  .pipeline-connector {
+    width: 1px;
+    height: 100%;
+    min-height: 40px;
+    background: var(--border);
+  }
+
+  .pipeline-content {
+    padding-bottom: 1.5rem;
+  }
+
+  .pipeline-title {
+    font-weight: 500;
+    color: #e0e0f0;
+    font-size: 0.9rem;
+    margin-bottom: 0.3rem;
+  }
+
+  .pipeline-desc {
+    font-size: 0.8rem;
+    color: var(--text-dim);
+    line-height: 1.6;
+  }
+
+  /* ===== Footer ===== */
+  footer {
+    text-align: center;
+    padding: 4rem 1.5rem 2rem;
+    max-width: 800px;
+    margin: 0 auto;
+  }
+
+  footer a {
+    color: var(--accent2);
+    text-decoration: none;
+    transition: color 0.3s;
+  }
+
+  footer a:hover { color: var(--accent3); }
+
+  .footer-links {
+    display: flex;
+    gap: 2rem;
+    justify-content: center;
+    margin-bottom: 2rem;
+    flex-wrap: wrap;
+  }
+
+  .footer-links a {
+    font-size: 0.85rem;
+    font-family: 'JetBrains Mono', monospace;
+  }
+
+  .footer-copy {
+    font-size: 0.7rem;
+    color: var(--text-dim);
+  }
+
+  .footer-legal {
+    font-size: 0.65rem;
+    color: #333;
+    margin-top: 1rem;
+    line-height: 1.6;
+  }
+
+  /* ===== Animations ===== */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(20px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .reveal {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.8s ease, transform 0.8s ease;
+  }
+
+  .reveal.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+</style>
+</head>
+<body>
+
+<canvas id="stars"></canvas>
+
+<div class="content">
+
+  <!-- ========== HERO ========== -->
+  <div class="hero">
+    <div class="hero-badge">Pokemon x Vampire Survivors</div>
+    <h1 class="hero-title">POKE SURVIVOR</h1>
+    <p class="hero-sub">5분마다 새 포켓몬을 골라, 군단을 키워, 끝없이 강해져라.</p>
+    <div class="hero-meta">
+      <span><span class="dot"></span>v2.0.0</span>
+      <span><span class="dot"></span>Mobile Web</span>
+      <span><span class="dot"></span>27 Phases</span>
+      <span><span class="dot"></span>60+ Features</span>
+    </div>
+  </div>
+
+  <!-- ========== CHAPTER 01 — CONCEPT ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 01 — the concept</div>
+    <h2>포켓몬 불시던의 세계에서<br>뱀서라이크를 만든다면?</h2>
+    <p>
+      <span class="highlight">Pokemon Mystery Dungeon</span>의 사랑스러운 PMD 스프라이트와
+      <span class="accent-text">Vampire Survivors</span>의 중독성 있는 자동 전투 루프.
+      두 장르의 교차점에서 태어난 모바일 웹 팬게임입니다.
+    </p>
+    <p>
+      한 손 가상 조이스틱으로 이동하고, 공격은 자동.
+      5분 사이클마다 보스를 잡으면 파티 전체가 <span class="gold-text">군단</span>으로 압축되어
+      다음 사이클에 자동 전투에 합류합니다.
+      매 사이클마다 군단이 늘어나고, 적도 강해지는 — 끝없는 루프.
+    </p>
+
+    <div class="img-card">
+      <img src="images/title-screen.png" alt="Title Screen" loading="lazy">
+      <div class="img-caption">타이틀 화면 — 스타터 3종 선택 (피카츄 / 파이리 / 꼬부기)</div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 02 — GAMEPLAY ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 02 — the gameplay</div>
+    <h2>5분 사이클, 무한 반복</h2>
+    <p>
+      매 사이클은 5분. 웨이브마다 적이 밀려오고, 레벨업하면 퍽을 선택합니다.
+      <span class="highlight">크리티컬</span>, <span class="highlight">흡혈</span>,
+      <span class="highlight">XP 자석</span>, <span class="highlight">진화</span> — 8가지 퍽 중 3개가 랜덤으로 제시됩니다.
+    </p>
+    <p>
+      3분이 지나면 경고음과 함께 BGM이 <span class="accent-text">Monster House!</span>로 전환.
+      4분에 보스가 등장하면 <span class="accent-text">Boss Battle!</span> 음악이 울려퍼집니다.
+      3사이클 이후부터는 <span class="gold-text">Versus Legendary</span>가 흐릅니다.
+    </p>
+
+    <div class="img-grid">
+      <div class="img-card">
+        <img src="images/battle-action.png" alt="Battle" loading="lazy">
+        <div class="img-caption">전투 장면 — PMD 스프라이트 + 데미지 팝업</div>
+      </div>
+      <div class="img-card">
+        <img src="images/battle-particles.png" alt="Particles" loading="lazy">
+        <div class="img-caption">파티클 이펙트 + 킬 스트릭 콤보</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 03 — LEGION ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 03 — the legion</div>
+    <h2>보스를 쓰러뜨리면,<br>파티가 군단이 된다</h2>
+    <p>
+      이 게임의 핵심 시스템. 사이클을 클리어하면 현재 파티(에이스 + 동료들)가
+      <span class="gold-text">군단(Legion)</span>으로 압축됩니다.
+      다음 사이클에서 새 에이스를 선택하면, 이전 군단들이 자동으로 주위를 돌며 전투합니다.
+    </p>
+    <p>
+      사이클을 반복할수록 군단이 늘어나고, 난이도도 상승합니다.
+      <span class="highlight">Normal+ → Hard → Nightmare → Inferno</span>.
+    </p>
+
+    <div class="img-card">
+      <img src="images/legion-system.png" alt="Legion System" loading="lazy">
+      <div class="img-caption">Cycle 2 — 이전 사이클의 군단(청록색)이 자동 전투 중</div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== QUOTE ========== -->
+  <section class="reveal">
+    <div class="quote-block">
+      <p>스킬 이펙트랑 배경음악이 포켓몬게임 향수의 근원이야</p>
+      <p class="quote-src">— 프로젝트 오너, 리소스 교체를 지시하며</p>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 04 — PMD RESOURCES ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 04 — the nostalgia</div>
+    <h2>진짜 PMD 리소스로<br>포켓몬 감성을 살리다</h2>
+    <p>
+      그래픽은 <span class="highlight">PMD SpriteCollab</span>의 8방향 걷기 애니메이션,
+      오디오는 <span class="highlight">pokemonAutoChess</span> 프로젝트의 PMD 던전 음악과 효과음,
+      이펙트는 동일 프로젝트의 타입별 공격 스프라이트를 사용합니다.
+    </p>
+    <p>
+      피카츄를 선택하면 전기 투사체가 날아가고,
+      파이리를 선택하면 화염 이펙트가,
+      꼬부기를 선택하면 물방울이 적을 때립니다.
+    </p>
+
+    <div class="img-grid">
+      <div class="img-card">
+        <img src="images/pmd-gameplay.png" alt="PMD Sprites" loading="lazy">
+        <div class="img-caption">PMD 스프라이트 — 피카츄, 꼬부기, 주뱃, 꼬렛</div>
+      </div>
+      <div class="img-card">
+        <img src="images/levelup.png" alt="Level Up" loading="lazy">
+        <div class="img-caption">레벨업 — 초상화 + 퍽 선택 카드</div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 05 — TIMELINE ========== -->
+  <section class="section-wide reveal">
+    <div class="section-label">chapter 05 — the build</div>
+    <h2>27 Phase, 이틀간의 기록</h2>
+    <div class="pipeline">
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot"></div><div class="pipeline-connector"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 1 — 코어 프로토타입</div>
+          <div class="pipeline-desc">Phaser 3 + Vite + TypeScript. 조이스틱, 자동 공격, XP, 레벨업. 모든 것이 원(circle) 플레이스홀더.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot"></div><div class="pipeline-connector"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 2-3 — 보스 & 군단 시스템</div>
+          <div class="pipeline-desc">5분 사이클 루프, 보스전, 군단 자동 전투. 무한 스케일링의 핵심 메카닉 완성.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot"></div><div class="pipeline-connector"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 4-6 — PMD 스프라이트 & 타이틀</div>
+          <div class="pipeline-desc">원(circle)에서 실제 포켓몬으로. 9종 PMD Walk 스프라이트, 초상화, 타이틀 화면.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot gold"></div><div class="pipeline-connector"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 20 — v1.0.0 Release</div>
+          <div class="pipeline-desc">업적 13종, 일시정지 메뉴, 진화 시스템, 미니맵, 엘리트 적. 50+ 기능 완성.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot"></div><div class="pipeline-connector"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 21-26 — v2.0.0</div>
+          <div class="pipeline-desc">스타터 선택, 전투 퍽, 무한 모드, 회피 구르기, 원거리 적, 미니보스, 튜토리얼.</div>
+        </div>
+      </div>
+      <div class="pipeline-step">
+        <div class="pipeline-line"><div class="pipeline-dot pink"></div><div class="pipeline-connector" style="min-height:0"></div></div>
+        <div class="pipeline-content">
+          <div class="pipeline-title">Phase 27 — Real PMD Audio & Effects</div>
+          <div class="pipeline-desc">프로시저럴 오디오를 실제 PMD 던전 음악 8곡 + SFX 9종으로 교체. 타입별 공격 이펙트 74장 적용.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 06 — TECH STACK ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 06 — the stack</div>
+    <h2>기술 스택</h2>
+    <div class="tech-grid">
+      <div class="tech-item"><div class="tech-name">Phaser 3</div><div class="tech-role">Game Engine</div></div>
+      <div class="tech-item"><div class="tech-name">TypeScript</div><div class="tech-role">Language</div></div>
+      <div class="tech-item"><div class="tech-name">Vite</div><div class="tech-role">Bundler</div></div>
+      <div class="tech-item"><div class="tech-name">PMD Sprites</div><div class="tech-role">Graphics</div></div>
+      <div class="tech-item"><div class="tech-name">PMD Music</div><div class="tech-role">BGM / SFX</div></div>
+      <div class="tech-item"><div class="tech-name">Arcade Physics</div><div class="tech-role">Collision</div></div>
+    </div>
+  </section>
+
+  <div class="divider"><div class="divider-line"></div></div>
+
+  <!-- ========== CHAPTER 07 — FEATURES ========== -->
+  <section class="reveal">
+    <div class="section-label">chapter 07 — the features</div>
+    <h2>60+ 기능, 3100줄</h2>
+    <p>
+      <span class="gold-text">게임플레이</span> — 가상 조이스틱, 자동 공격, 멀티샷(3/5-way), 관통, 회피 구르기(무적 프레임), 8가지 전투 퍽
+    </p>
+    <p>
+      <span class="gold-text">포켓몬</span> — PMD 8방향 걷기 9종, 스타터 3종(각자 고유 스탯), 진화 시스템, 동료 3타입(투사체/궤도/광역)
+    </p>
+    <p>
+      <span class="gold-text">적</span> — 5가지 AI(추적/선회/돌진/군집/원거리), 엘리트, 미니보스, 보스 로테이션, 난이도 4단계
+    </p>
+    <p>
+      <span class="gold-text">시스템</span> — 업적 13종, 하이스코어 저장, 일시정지 메뉴, 볼륨 조절, 미니맵, 킬 스트릭 콤보
+    </p>
+    <p>
+      <span class="gold-text">오디오</span> — PMD 던전 음악 8곡, 장면별 BGM 크로스페이드, 효과음 9종, 타입별 공격 이펙트
+    </p>
+  </section>
+
+  <!-- ========== FOOTER ========== -->
+  <footer>
+    <div class="footer-links">
+      <a href="https://songclaude-bot.github.io">Home</a>
+      <a href="https://github.com/songclaude-bot/poke-survivor">Source Code</a>
+    </div>
+    <div class="footer-copy">
+      human + claude &middot; 2026
+    </div>
+    <div class="footer-legal">
+      Non-commercial fan project. Pokemon is &copy; Nintendo / Game Freak / Creatures Inc.<br>
+      Sprites: PMD SpriteCollab (CC BY-NC 4.0) &middot; Audio: pokemonAutoChessMusic (CC BY-NC 4.0)
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  // ===== Stars =====
+  const canvas = document.getElementById('stars');
+  const ctx = canvas.getContext('2d');
+  let stars = [];
+
+  function initStars() {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    stars = [];
+    const count = Math.floor((canvas.width * canvas.height) / 5000);
+    for (let i = 0; i < count; i++) {
+      stars.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 1.2 + 0.2,
+        alpha: Math.random(),
+        delta: (Math.random() * 0.015 + 0.003) * (Math.random() < 0.5 ? 1 : -1)
+      });
+    }
+  }
+
+  function drawStars() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    stars.forEach(s => {
+      s.alpha += s.delta;
+      if (s.alpha <= 0.05 || s.alpha >= 1) s.delta *= -1;
+      ctx.beginPath();
+      ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+      ctx.fillStyle = `rgba(150, 160, 220, ${s.alpha})`;
+      ctx.fill();
+    });
+    requestAnimationFrame(drawStars);
+  }
+
+  window.addEventListener('resize', initStars);
+  initStars();
+  drawStars();
+
+  // ===== Scroll Reveal =====
+  const reveals = document.querySelectorAll('.reveal');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('visible');
+      }
+    });
+  }, { threshold: 0.1 });
+
+  reveals.forEach(el => observer.observe(el));
+</script>
+
+</body>
+</html>
