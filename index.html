@@ -257,6 +257,33 @@
   .footer-copy { font-size: 0.7rem; color: var(--text-dim); }
   .footer-legal { font-size: 0.6rem; color: #333; margin-top: 1rem; line-height: 1.8; }
 
+  /* ===== Screenshots ===== */
+  .screenshot-gallery {
+    display: flex; gap: 1.2rem;
+    justify-content: center; align-items: flex-start;
+    margin: 2.5rem 0;
+  }
+  @media (max-width: 600px) {
+    .screenshot-gallery { flex-direction: column; align-items: center; }
+  }
+  .screenshot-frame {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 12px; overflow: hidden;
+    transition: border-color 0.3s, transform 0.3s;
+    flex: 0 1 auto; max-width: 220px;
+  }
+  .screenshot-frame:hover { border-color: var(--pmd-gold); transform: translateY(-3px); }
+  .screenshot-frame img {
+    width: 100%; height: auto; display: block;
+    image-rendering: auto;
+  }
+  .screenshot-caption {
+    padding: 0.5rem 0.6rem;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 0.65rem; color: var(--text-dim);
+    text-align: center; letter-spacing: 0.05em;
+  }
+
   /* ===== Animations ===== */
   @keyframes fadeUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
   .reveal { opacity: 0; transform: translateY(30px); transition: opacity 0.8s ease, transform 0.8s ease; }
@@ -291,6 +318,16 @@
     <h2>포켓몬 불가사의 던전의 세계에서<br>뱀서라이크를 만들면 어떨까?</h2>
     <p><span class="highlight">포켓몬 불가사의 던전</span> 시리즈의 사랑스러운 도트 스프라이트와 <span class="red">Vampire Survivors</span>의 중독성 있는 자동 전투 루프. 두 장르가 만나는 지점에서 태어난 모바일 웹 팬게임입니다.</p>
     <p>화면 왼쪽을 드래그해서 이동하고, 공격은 자동으로 발사됩니다. 오른쪽을 탭하면 무적 프레임이 있는 회피 구르기를 할 수 있습니다. 경험치 보석을 모아 레벨을 올리면 전투 능력을 강화하는 퍽을 선택할 수 있습니다.</p>
+    <div class="screenshot-gallery">
+      <div class="screenshot-frame">
+        <img src="images/ss-title.png" alt="타이틀 화면 — 스타터 포켓몬 선택">
+        <div class="screenshot-caption">타이틀 화면 + 스타터 선택</div>
+      </div>
+      <div class="screenshot-frame">
+        <img src="images/ss-gameplay.png" alt="게임플레이 — 피카츄가 불꽃 공격으로 적을 처치하는 장면">
+        <div class="screenshot-caption">실시간 전투 + 타입별 공격 이펙트</div>
+      </div>
+    </div>
   </section>
 
   <div class="divider"><div class="divider-line"></div></div>
